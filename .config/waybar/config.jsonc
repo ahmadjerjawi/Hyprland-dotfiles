@@ -1,0 +1,171 @@
+{
+    "layer": "bottom", // Changed layer back to bottom as in your latest version
+    "position": "top",
+    "height": 28,
+    "spacing": 0,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-right": [
+        "custom/camera",
+        "custom/pacman",
+        "disk",
+        "custom/network-traffic", // Use the custom module name here
+        "clock",
+        "bluetooth",
+        "pulseaudio",
+        "network#status",
+        "custom/battery",
+        "hyprland/language",
+        "tray"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "persistent_workspaces": {
+            "*": 5
+        },
+        "all-outputs": true,
+        "on-click": "activate",
+        "on-scroll-up": "hyprctl dispatch workspace -1",
+        "on-scroll-down": "hyprctl dispatch workspace +1"
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 50,
+        "rewrite": {
+            "(.*) - (.*)": "$2: $1"
+        },
+        "separate-outputs": true
+    },
+
+    "custom/camera": {
+        "exec": "bash -c \"if lsmod | grep -q '^uvcvideo'; then if lsof /dev/video* 2>/dev/null | grep -q '.'; then echo '󰄀'; else echo ''; fi; else echo ''; fi\"",
+        "interval": 5,
+        "format": "{}",
+        "tooltip": true,
+        "tooltip-format": "Camera module status",
+        "on-click": "notify-send 'Camera Users' \"$(lsof /dev/video* 2>/dev/null | awk 'NR>1{print $1}' | sort -u || echo 'None')\"",
+        "on-click-right": "notify-send 'Camera Module' 'Shows camera usage status'"
+    },
+
+    "custom/pacman": {
+        "exec": "sh -c 'updates=$(checkupdates 2>/dev/null | wc -l); if [ \"$updates\" -gt 0 ]; then printf \"{\\\"text\\\": \\\"📦 %s\\\", \\\"tooltip\\\": \\\"%s updates available\\\", \\\"class\\\": \\\"updates-available\\\"}\\n\" \"$updates\" \"$updates\"; else printf \"{\\\"text\\\": \\\"\\\"}\\n\"; fi'",
+        "return-type": "json",
+        "format": "{text}",
+        "interval": 3600,
+        "tooltip": true,
+        "on-click": "alacritty -e sudo pacman -Syu",
+        "on-click-middle": "notify-send 'Pending Updates' \"$(checkupdates || echo 'None')\"",
+        "on-click-right": "notify-send '🎁 Upgrade module' '📦: number of upgradable packages\\n- Left click to upgrade packages\\n- Middle click to show upgradable packages'",
+        "signal": 8
+    },
+
+    "disk": {
+        "path": "/",
+        "format": "🖥 {used}/{total}",
+        "interval": 30,
+        "tooltip": true,
+        "tooltip-format": "{path} - Free: {free} ({percentage_free}%)",
+        "on-click": "notify-send '💽 Disk space' \"$(df -h --output=target,used,size)\"",
+        "on-click-right": "notify-send '💽 Disk module' \"- Shows used hard drive space.\\n- Click to show all disk info.\""
+    },
+
+    "custom/network-traffic": {
+        // Corrected exec using bash -c '...' for simpler quoting
+        "exec": "bash -c 'update() { sum=0; for arg; do read -r i < \"$arg\"; sum=$(( sum + i )); done; cache=/tmp/${1##*/}; [ -f \"$cache\" ] && read -r old < \"$cache\" || old=0; printf \"%d\\n\" \"$sum\" > \"$cache\"; printf \"%d\\n\" $(( sum - old )); }; rx=$(update /sys/class/net/[ew]*/statistics/rx_bytes); tx=$(update /sys/class/net/[ew]*/statistics/tx_bytes); printf \"{\\\"text\\\": \\\"󰇚%4sB 󰕒%4sB\\\"}\" $(numfmt --to=iec $rx $tx)'",
+        "return-type": "json",
+        "interval": 1,
+        "format": "{text}", // Format comes from the JSON text field
+        "tooltip": false,
+        "on-click": "bash -c 'if pgrep -x bmon > /dev/null; then pkill -x bmon; else setsid -f foot -e bmon; fi'",
+        "on-click-right": "notify-send \"🌐 Network traffic module\" \"🔻: Traffic received\\n🔺: Traffic transmitted\""
+    },
+
+    "clock": {
+        "format": "{:%I:%M %p %a %m-%d}",
+        "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+        "tooltip-format": "<big>{:%Y %B %d}</big>\n<tt><small>{calendar}</small></tt>",
+        "interval": 1,
+        "on-click": "notify-send 'Calendar' \"$(cal -m)\"",
+        "on-click-right": "notify-send 'Date & Time' \"$(date '+%A, %B %d, %Y\n%I:%M:%S %p')\""
+    },
+
+    "bluetooth": {
+        // Simplified format using icons directly, removed redundant format-icons
+        "format": "{icon}",
+        "format-off": "󰂲",
+        "format-disabled": "󰂲",
+        "format-on": "󰂯",
+        "format-connected": "󰂱",
+        // "format-icons": { // This is somewhat redundant if using format-* above
+        //     "enabled": "󰂯",
+        //     "disabled": "󰂲",
+        //     "connected": "󰂱"
+        // },
+        "tooltip-format": "Bluetooth: {status}",
+        "tooltip-format-connected": "{device_alias} ({device_battery_percentage}%)",
+        "tooltip-format-off": "Bluetooth: Off",
+        "tooltip-format-disabled": "Bluetooth: Disabled",
+        "interval": 10,
+        "on-click": "notify-send \"Bluetooth Device\" \"$(bluetoothctl info | grep -E 'Name:|Alias:|Battery Percentage:' || echo 'Not Connected')\"",
+        "on-click-right": "notify-send 'Bluetooth Status' \"$(bluetoothctl show)\nConnected: $(bluetoothctl devices Connected)\"",
+        "on-click-middle": "bluetoothctl power toggle"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "🔇",
+        "format-icons": {
+            "headphone": "🎧",
+            "headset": "🎧",
+            "port": ["🔌", "🎧", "🎤"],
+            "speaker": ["🔈", "🔉", "🔊"],
+            "default": ["🔈", "🔉", "🔊"]
+        },
+        "scroll-step": 1,
+        "tooltip": true,
+        "tooltip-format": "{desc} ({volume}%)",
+        "on-click": "pavucontrol",
+        "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"
+    },
+
+    "network#status": {
+        // Changed format-wifi to show icon and essid like before
+        "format-wifi": "{icon} {essid}", // Reverted to show ESSID
+        "format-ethernet": "󰈀",
+        "format-disconnected": "⚠",
+        "format-icons": ["󰤟", "󰤢", "󰤥", "󰤨"],
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}\nSignal: {signalStrength}% @ {frequency}MHz\nGateway: {gwaddr}",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}\nGateway: {gwaddr}",
+        "tooltip-format-disconnected": "No Network Connection",
+        "interval": 5,
+        "on-click": "nm-connection-editor || foot -e nmtui",
+        "on-click-right": "notify-send 'Network Status' \"$(ip -brief addr)\n$(ip route | grep default)\""
+    },
+
+    "custom/battery": {
+        "exec": "bash -c '#!/bin/bash\nfor battery in /sys/class/power_supply/BAT?*; do\n    if [ -f \"$battery/capacity\" ] && [ -f \"$battery/status\" ]; then\n        capacity=$(cat \"$battery/capacity\")\n        status=$(cat \"$battery/status\")\n        # Round 99% to 100%\n        [ \"$capacity\" = \"99\" ] && capacity=100\n        # Set icon based on status and capacity\n        if [ \"$status\" = \"Charging\" ]; then\n            icon=\" \" # Add charging icon text\n            class=\"charging\"\n        else\n            # Add battery icons based on capacity\n            if [ \"$capacity\" -gt 90 ]; then icon=\" \"; class=\"full\";\n            elif [ \"$capacity\" -gt 60 ]; then icon=\" \"; class=\"high\";\n            elif [ \"$capacity\" -gt 30 ]; then icon=\" \"; class=\"medium\";\n            elif [ \"$capacity\" -gt 15 ]; then icon=\" \"; class=\"low\";\n            else icon=\" \"; class=\"critical\"; fi # Added critical icon\n        fi\n        # Output as JSON for Waybar\n        # Removed explicit icon=\"\" as we now set it above\n        printf \"{\\\"text\\\":\\\"%s%d%%\\\", \\\"class\\\":\\\"%s\\\", \\\"tooltip\\\":\\\"Battery: %d%% (%s)\\\"}\" \"$icon\" \"$capacity\" \"$class\" \"$capacity\" \"$status\"\n        exit 0\n    fi\ndone\n\n# If no battery is found\nprintf \"{\\\"text\\\":\\\"No Battery\\\", \\\"tooltip\\\":\\\"No battery detected\\\"}\"'",
+        "interval": 10,
+        "return-type": "json",
+        "on-click": "notify-send 'Battery Status' \"$(acpi -b)\"",
+        "on-click-right": "notify-send 'Power Management' \"$(powerstat -d 0 2>&1 | head -20 || echo 'powerstat not installed')\""
+    },
+
+    "hyprland/language": {
+        "format": "⌨ {short}",
+        "tooltip": true,
+        "tooltip-format": "Layout: {long}", // Simplified tooltip
+        "interval": 1,
+        "on-click": "bash -c 'layouts=$(localectl list-x11-keymap-layouts); selected=$(echo \"$layouts\" | rofi -dmenu -p \"Select Keyboard Layout\"); if [ -n \"$selected\" ]; then hyprctl keyword input:kb_layout \"$selected\"; fi'",
+        "on-click-right": "notify-send 'Keyboard Layout' \"Current: $(hyprctl -j getoption input:kb_layout | jq -r '.str')\"",
+        "on-click-middle": "hyprctl switchxkblayout $(hyprctl devices -j | jq -r '.keyboards[0].name') next"
+    },
+
+    "tray": {
+        "icon-size": 14,
+        "spacing": 4
+    }
+}

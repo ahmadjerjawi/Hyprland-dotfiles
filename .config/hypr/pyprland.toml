@@ -1,0 +1,14 @@
+[pyprland]
+plugins = ["scratchpads"]
+
+[scratchpads.calc]
+command = "alacritty --class scratchpad -e bc"# check: hyprctl clients | grep class
+size = "500px 500px"
+
+[scratchpads.term]
+command = "alacritty --class scratchpad"
+size = "600px 400px"
+
+[scratchpads.audio]
+command = "alacritty --class scratchpad -e pulsemixer"
+size = "870px  500px"

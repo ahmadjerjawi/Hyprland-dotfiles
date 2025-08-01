@@ -1,0 +1,250 @@
+/* --- Base Colors (base16-default-dark) --- */
+@define-color base00 #181818; /* bg */
+@define-color base01 #282828; /* accent */
+@define-color base02 #383838;
+@define-color base03 #585858;
+@define-color base04 #b8b8b8;
+@define-color base05 #d8d8d8;
+@define-color base06 #e8e8e8;
+@define-color base07 #f8f8f8; /* text / invText */
+@define-color base08 #ab4642; /* red */
+@define-color base09 #dc9656; /* orange/brown */
+@define-color base0A #f7ca88; /* yellow */
+@define-color base0B #a1b56c; /* green */
+@define-color base0C #86c1b9; /* cyan */
+@define-color base0D #7cafc2; /* blue */
+@define-color base0E #ba8baf; /* magenta */
+@define-color base0F #a16946; /* brown */
+
+/* --- Main Theme Variables --- */
+@define-color accent @base01;
+@define-color text @base07;
+@define-color invText @base07; /* Text on accent background */
+@define-color bg @base00;
+
+/* --- Media Controls Color --- */
+@define-color media @base0D; /* Unified color for network/bluetooth/audio */
+
+/* --- Global Styles --- */
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 12px;
+    border-radius: 0;
+    border: none;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+window#waybar {
+    background-color: @bg;
+    color: @text;
+    border-bottom: 2px solid @accent;
+    min-height: 28px;
+}
+
+/* --- Module Layout Styles --- */
+.modules-left {
+    margin-left: 6px;
+}
+
+.modules-right {
+    margin-right: 6px;
+}
+
+/* --- Workspace Styles --- */
+#workspaces {
+    background-color: @accent;
+    margin: 4px 0px 4px 0px;
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+#workspaces button {
+    color: @text;
+    padding: 0 4px;
+    background-color: transparent;
+    border-radius: 2px;
+    margin: 2px 2px;
+}
+
+#workspaces button.active {
+    background-color: @base0D;
+    color: @bg;
+}
+
+#workspaces button.occupied {
+    color: @base0D;
+}
+
+#workspaces button.active.occupied {
+    background-color: @base0D;
+    color: @bg;
+}
+
+#workspaces button.urgent {
+    background-color: @base08;
+    color: @bg;
+}
+
+/* --- Window Title Style --- */
+#window {
+    color: @text;
+    margin-left: 8px;
+    font-weight: bold;
+}
+
+/* --- Generic Module Styles --- */
+#disk,
+#clock,
+#bluetooth,
+#pulseaudio,
+#tray,
+#custom-camera,
+#custom-pacman,
+#custom-battery,
+#network,
+#language,
+#custom-network-traffic,
+#network-status,
+#hyprland-language {
+    padding: 0 5px;
+    margin: 4px 1px;
+    border-radius: 4px;
+    background-color: @base02;
+    min-width: 10px;
+}
+
+/* --- Specific Module Styles --- */
+#clock {
+    background-color: @accent;
+    color: @text;
+    font-weight: bold;
+}
+
+/* Change colors for network traffic, bluetooth, and volume to be the same */
+#custom-network-traffic {
+    background-color: @base02;
+    color: @media;
+}
+
+#bluetooth {
+    background-color: @base02;
+    color: @media;
+}
+
+#bluetooth.connected {
+    background-color: @base02;
+    color: @media;
+}
+
+#bluetooth.disabled, #bluetooth.off {
+    background-color: @base02;
+    color: @base08;
+}
+
+#pulseaudio {
+    background-color: @base02;
+    color: @media;
+}
+
+#pulseaudio.muted {
+    background-color: @base02;
+    color: @base08;
+}
+
+#network-status {
+    background-color: @base02;
+    color: @media;
+}
+
+#network-status.disconnected {
+    background-color: @base02;
+    color: @base08;
+}
+
+#custom-pacman.updates-available {
+    background-color: @base0A;
+    color: @bg;
+}
+
+#disk {
+    background-color: @base0F;
+    color: @text;
+}
+
+/* Battery colors by level */
+#custom-battery {
+    background-color: @base02;
+}
+
+/* Different battery colors based on charge level */
+#custom-battery.charging {
+    color: @base0D; /* Blue when charging */
+}
+
+#custom-battery.full {
+    color: @base0B; /* Green when full */
+}
+
+#custom-battery.high {
+    color: @base0B; /* Green when high */
+}
+
+#custom-battery.medium {
+    color: @base0A; /* Yellow when medium */
+}
+
+#custom-battery.low {
+    color: @base09; /* Orange when low */
+}
+
+#custom-battery.critical {
+    color: @base08; /* Red when critical */
+}
+
+#hyprland-language {
+    background-color: @base02;
+    color: @base0E;
+}
+
+#custom-camera {
+    background-color: transparent;
+    color: @base08;
+}
+
+/* --- Tray Styles --- */
+#tray {
+    background-color: @accent;
+    margin-right: 0;
+}
+
+#tray menu {
+    background-color: @bg;
+    color: @text;
+    border: 1px solid @accent;
+}
+
+#tray > .needs-attention {
+    background-color: @base08;
+    color: @bg;
+}
+
+/* --- States --- */
+#pulseaudio.muted {
+    background-color: @base02;
+    color: @base08;
+}
+
+/* --- Hover Effects --- */
+#custom-network-traffic:hover,
+#network-status:hover,
+#custom-battery:hover,
+#hyprland-language:hover,
+#bluetooth:hover,
+#pulseaudio:hover,
+#clock:hover,
+#disk:hover {
+    background-color: @base03;
+    transition: background-color 0.2s;
+}
