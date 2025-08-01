@@ -9,9 +9,9 @@
 ## 🔍 Preview
 
 <div align="center">
-  <img src="previews/preview1.png" width="30%">
-  <img src="previews/preview2.png" width="30%">
-  <img src="previews/preview3.png" width="30%">
+  <img src="previews/preview1.png" width="70%">
+  <img src="previews/preview2.png" width="70%">
+  <img src="previews/preview3.png" width="70%">
 </div>
 
 ---
